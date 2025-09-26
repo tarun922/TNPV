@@ -1,0 +1,90 @@
+[
+    {
+    "id": "jeemain_nlm_advanced",
+    "fileName": "nlm_advanced_set.txt",
+    "subject": "physics",
+    "chapterNum": "3",
+    "title": "JEE Main: NLM & Friction (15 Qns)",
+    "content": [
+        {
+            "q": "A block of mass $M$ is pulled by a force $F$ on a smooth horizontal surface, causing acceleration $a$. If the force is doubled, the new acceleration is: \n(A) $a/2$ \n(B) $a$ \n(C) $2a$ \n(D) $4a$",
+            "type": "text_area",
+            "answer": "The correct option is (C). According to Newton's Second Law, $F=Ma$, so $a=F/M$. If the force is doubled to $F'=2F$, the new acceleration is $a' = 2F/M = 2a$."
+        },
+        {
+            "q": "The linear momentum of a body is increased by $100\\%$. The percentage increase in its kinetic energy is: (A) $100\\%$ (B) $200\\%$ (C) $300\\%$ (D) $400\\%$",
+            "type": "text_area",
+            "answer": "The correct option is (C). Kinetic Energy ($KE$) is $p^2/(2m)$. If momentum $p$ increases by $100\\%$, the new momentum is $p' = 2p$. New KE is $KE' = (2p)^2/(2m) = 4 \\cdot KE$. The increase is $KE' - KE = 3 \\cdot KE$, which is a $300\\%$ increase."
+        },
+        {
+            "q": "A body of mass $5 \\text{ kg}$ is suspended by a string. The acceleration (in $\\text{m/s}^2$) with which the body must move up such that the tension in the string is $60 \\text{ N}$ is: ($g=10 \\text{ m/s}^2$) (A) $1 \\text{ m/s}^2$ (B) $2 \\text{ m/s}^2$ (C) $3 \\text{ m/s}^2$ (D) $4 \\text{ m/s}^2$",
+            "type": "text_area",
+            "answer": "The correct option is (B). Applying Newton's Second Law vertically: $T - mg = ma$. Substituting values: $60 - (5)(10) = 5a$. $60 - 50 = 5a$. $10 = 5a$, so $a = 2 \\text{ m/s}^2$."
+        },
+        {
+            "q": "A force $\\vec{F} = 6\\hat{i} + 8\\hat{j}$ (in $\\text{N}$) acts on a body of mass $10 \\text{ kg}$. The magnitude of the resulting acceleration (in $\\text{m/s}^2$) is: (A) $1$ (B) $1.4$ (C) $10$ (D) $100$",
+            "type": "text_area",
+            "answer": "The correct option is (A). Magnitude of force is $|\\vec{F}| = \\sqrt{6^2 + 8^2} = \\sqrt{36 + 64} = 10 \\text{ N}$. Acceleration $a = F/m = 10 \\text{ N} / 10 \\text{ kg} = 1 \\text{ m/s}^2$."
+        },
+        {
+            "q": "The limiting friction is: (A) Always greater than dynamic (kinetic) friction. (B) Always less than dynamic friction. (C) Always equal to dynamic friction. (D) Independent of the normal force.",
+            "type": "text_area",
+            "answer": "The correct option is (A). Limiting (static) friction is the maximum static friction force ($\\mu_s N$), which is generally greater than the kinetic/dynamic friction ($\\mu_k N$)."
+        },
+        {
+            "q": "A bullet of mass $20 \\text{ g}$ is fired from a gun of mass $2 \\text{ kg}$ with a muzzle velocity of $150 \\text{ m/s}$. The magnitude of the recoil velocity of the gun (in $\\text{m/s}$) is: (A) $1.5$ (B) $3$ (C) $0.5$ (D) $30$",
+            "type": "text_area",
+            "answer": "The correct option is (A). By Conservation of Momentum: $m_{\\text{bullet}} v_{\\text{bullet}} + m_{\\text{gun}} v_{\\text{gun}} = 0$. $(0.02 \\text{ kg})(150 \\text{ m/s}) + (2 \\text{ kg}) v_{\\text{gun}} = 0$. $3 + 2 v_{\\text{gun}} = 0$. $v_{\\text{gun}} = -1.5 \\text{ m/s}$. The magnitude is $1.5 \\text{ m/s}$."
+        },
+        {
+            "q": "A horse exerts a $200 \\text{ N}$ force on a carriage at an angle of $30^\\circ$ above the horizontal. The magnitude of the horizontal force component (in $\\text{N}$) on the carriage is:",
+            "type": "numerical",
+            "correctValue": 173.2
+        },
+        {
+            "q": "A particle of mass $m=2 \\text{ kg}$ is subjected to a time-dependent force $F = 4t$ (in $\\text{N}$). If the particle starts from rest, what is the speed (in $\\text{m/s}$) after $2 \\text{ seconds}$? (Enter the value as an integer)",
+            "type": "numerical",
+            "correctValue": 4
+        },
+        {
+            "q": "A block of mass $4 \\text{ kg}$ rests on a rough horizontal surface. A horizontal force of $20 \\text{ N}$ is applied. If the coefficient of static friction $\\mu_s = 0.6$, what is the magnitude of the friction force (in $\\text{N}$) acting on the block? ($g=10 \\text{ m/s}^2$)",
+            "type": "numerical",
+            "correctValue": 20
+        },
+        {
+            "q": "A car of mass $1000 \\text{ kg}$ moving at $10 \\text{ m/s}$ is stopped by a constant braking force of $2000 \\text{ N}$. The time taken (in $\\text{seconds}$) for the car to stop is:",
+            "type": "numerical",
+            "correctValue": 5
+        },
+        {
+            "q": "Three blocks of masses $m_1=1 \\text{ kg}$, $m_2=2 \\text{ kg}$, and $m_3=3 \\text{ kg}$ are connected by light strings and pulled by a force of $12 \\text{ N}$ on a frictionless horizontal surface. The acceleration of the system (in $\\text{m/s}^2$) is:",
+            "type": "numerical",
+            "correctValue": 2
+        },
+        {
+            "q": "Two objects of mass $10 \\text{ kg}$ and $6 \\text{ kg}$ are connected by a light string that passes over a smooth pulley (Atwood Machine). The tension (in $\\text{N}$) in the string is: ($g=10 \\text{ m/s}^2$)",
+            "type": "numerical",
+            "correctValue": 75
+        },
+        {
+            "q": "A block of mass $2 \\text{ kg}$ slides down a rough incline ($\\mu_k=0.5$) with an angle $\\theta=37^\\circ$ ($\\sin 37^\\circ = 0.6, \\cos 37^\\circ = 0.8$). The magnitude of the acceleration (in $\\text{m/s}^2$) of the block is: ($g=10 \\text{ m/s}^2$)",
+            "type": "numerical",
+            "correctValue": 2.0
+        },
+        {
+            "q": "A block is pulled horizontally with a force $F$ that is just enough to make it slide. The coefficient of static friction is $\\mu_s=0.8$. If the mass of the block is $5 \\text{ kg}$, the minimum force required to move it (in $\\text{N}$) is: ($g=10 \\text{ m/s}^2$)",
+            "type": "numerical",
+            "correctValue": 40
+        },
+        {
+            "q": "If the net external force acting on a body is zero, its velocity must be: (A) Zero (B) Constant (C) Always increasing (D) Perpendicular to its displacement",
+            "type": "text_area",
+            "answer": "The correct option is (B). According to Newton's First Law (or Second Law, $F_{\\text{net}}=0 \\implies a=0$), zero net force means zero acceleration. Zero acceleration means the velocity must be constant (which includes the case of being zero)."
+        }
+    ],
+    "preview": "Q1. Force and Acceleration... Q4. Recoil Velocity... (15 Questions: 8 MCQ, 7 NVQ)",
+    "uploadDate": "2025-09-26",
+    "fileSize": "15 Qns"
+}
+    
+]

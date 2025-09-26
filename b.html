@@ -6,7 +6,6 @@
     <title>Question Papers Hub</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
         
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,8 +19,6 @@
             --text-secondary: rgba(255, 255, 255, 0.8);
             --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             --glow: 0 0 30px rgba(102, 126, 234, 0.3);
-            --success-color: #4CAF50;
-            --error-color: #F44336;
         }
 
         * {
@@ -533,61 +530,17 @@
             transform: scale(1.1);
         }
 
-        /* --- Quiz Specific Styles --- */
-
-        .quiz-question {
-            margin-bottom: 30px; 
-            padding: 15px; 
-            border-radius: 10px; 
-            background: rgba(255, 255, 255, 0.05);
+        .modal-body {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        .quiz-question input[type="text"], .quiz-question textarea {
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 8px; 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            background: rgba(0, 0, 0, 0.3); 
-            color: var(--text-primary); 
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .quiz-question input[type="text"]:focus, .quiz-question textarea:focus {
-             border-color: rgba(102, 126, 234, 0.5);
-        }
-
-        .quiz-question textarea {
-            resize: vertical;
-        }
-        
-        .quiz-submit-btn {
-            padding: 15px 30px; 
-            border: none; 
-            border-radius: 50px; 
-            background: var(--primary-gradient); 
-            color: white; 
-            font-size: 1.1rem; 
-            font-weight: 700; 
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: var(--glow);
-            transition: transform 0.2s ease, opacity 0.3s;
-            width: 100%;
-            max-width: 400px;
-            display: block;
-        }
-
-        .quiz-submit-btn:hover {
-            transform: translateY(-3px);
-            opacity: 0.9;
-        }
-
-        /* --- End Quiz Specific Styles --- */
-
 
         /* Loading and Empty States */
         .loading {
@@ -694,26 +647,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
-    <script>
-    // Configuration to ensure MathJax renders all elements dynamically
-    // including content added to your modals or cards after the page loads.
-    window.MathJax = {
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']] // Defines single dollar signs for inline math
-        },
-        svg: {
-            fontCache: 'global'
-        },
-        startup: {
-            pageReady: function() {
-                // Initial rendering will happen here once MathJax is loaded
-                // The key step for your modal is Step 2 below.
-                return MathJax.startup.defaultPageReady();
-            }
-        }
-    };
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <div class="container">
@@ -743,9 +676,11 @@
         </div>
 
         <div id="papersContainer">
-            </div>
+            <!-- Papers will be loaded dynamically -->
+        </div>
     </div>
 
+    <!-- Modal for displaying paper content -->
     <div id="paperModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -767,181 +702,185 @@
             maths: { icon: '📐', name: 'Mathematics', color: 'maths' }
         };
 
-        // Fetch papers from directory structure (keeping original logic for now, but relying on sample data for interaction)
+        // Fetch papers from directory structure
         async function fetchPapersFromDirectory() {
             try {
-                // Fetch the local JSON file
-                const response = await fetch('papers.json'); 
+                const papers = [];
                 
-                // If the file is missing or network fails, response.ok will be false (e.g., 404)
-                if (!response.ok) {
-                    console.warn(`Local file 'papers.json' not found or failed to load. Falling back to loadSampleData(). Status: ${response.status}`);
-                    return []; // Return empty array to trigger the fallback in initializeApp
+                // Fetch from each subject directory
+                for (const [subject, config] of Object.entries(subjectConfig)) {
+                    try {
+                        const subjectPapers = await fetchSubjectPapers(subject);
+                        papers.push(...subjectPapers);
+                    } catch (error) {
+                        console.warn(`Could not load papers for ${subject}:`, error);
+                    }
                 }
                 
-                // Parse the JSON data into a JavaScript array
-                const papers = await response.json();
                 return papers;
             } catch (error) {
-                // This catches errors like the file being corrupted or unreachable
-                console.error("Error reading papers.json. Falling back to loadSampleData():", error);
+                console.error('Error fetching papers:', error);
                 return [];
             }
         }
-        
-        // **********************************************
-        // ********** MODIFIED SAMPLE DATA **************
-        // **********************************************
-        // Function to asynchronously load papers from the JSON file
-    async function loadPapers() {
-        try {
-            // Use the Fetch API to get the data from the new file
-            const response = await fetch('./papers.json'); 
+
+        // Fetch papers for a specific subject
+        async function fetchSubjectPapers(subject) {
+            const papers = [];
             
-            // Handle network errors (like file not found)
-            if (!response.ok) {
-                console.error(`HTTP error! status: ${response.status}`);
-                return []; // Return an empty array if loading fails
-            }
+            // Try to fetch common chapter names (you can expand this list)
+            const commonChapters = [
+                'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'ch6', 'ch7', 'ch8', 'ch9', 'ch10',
+                'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5',
+                'mechanics', 'thermodynamics', 'waves', 'optics', 'electricity',
+                'organic', 'inorganic', 'physical', 'analytical',
+                'algebra', 'calculus', 'geometry', 'trigonometry', 'statistics'
+            ];
             
-            // Parse the JSON data into a JavaScript array
-            const papers = await response.json();
-            return papers;
-        } catch (error) {
-            console.error("Could not load papers from papers.json:", error);
-            return []; // Return empty array on error
-        }
-    }
-        
-        // **********************************************
-        // ******* NEW QUIZ RENDERING FUNCTIONS *********
-        // **********************************************
-
-        // Function to render the interactive quiz form
-        function renderQuiz(paper) {
-            let quizHtml = '<form id="quizForm" onsubmit="event.preventDefault(); submitQuiz(\'' + paper.id + '\')">';
-            
-            paper.content.forEach((q, index) => {
-                const qNum = index + 1;
-                quizHtml += `
-                    <div class="quiz-question">
-                        <p style="color: var(--text-primary); font-weight: 600; font-size: 1.1rem; margin-bottom: 15px;">Q${qNum}. ${q.q}</p>
-                `;
-                
-                if (q.type === 'numerical') {
-                    // Text box for numerical answers
-                    quizHtml += `
-                        <input type="text" id="answer_${qNum}" data-correct="${q.correctValue}" placeholder="Enter your numerical answer here (e.g., 1.67)" 
-                               style="margin-bottom: 5px;">
-                        <p id="result_${qNum}" style="margin-top: 10px; font-size: 0.9rem;"></p>
-                    `;
-                } else if (q.type === 'text_area') {
-                    // Text area for open-ended answers
-                    quizHtml += `
-                        <textarea id="answer_${qNum}" placeholder="Write your definition, derivation, or explanation..." rows="4"
-                                  style="margin-bottom: 5px;"></textarea>
-                        <p id="result_${qNum}" style="margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; user-select: none;" 
-                           onclick="toggleModelAnswer(this, '${q.answer.replace(/'/g, "\\'")}')">
-                            💡 Show Model Answer
-                        </p>
-                    `;
-                }
-                
-                quizHtml += '</div>';
-            });
-
-            quizHtml += `
-                <button type="submit" class="quiz-submit-btn">
-                    Submit & Check Numerical Score
-                </button>
-                <div id="quizScore" style="margin-top: 20px; color: var(--maths-gradient); font-size: 1.2rem; font-weight: 700; text-align: center;"></div>
-            </form>`;
-
-            return quizHtml;
-        }
-
-        // Function to show/hide the model answer for text area questions
-        function toggleModelAnswer(element, modelAnswer) {
-            const resultElement = element.parentNode.querySelector(`#result_${element.id.split('_')[1]}`);
-            
-            // Check the current state of the answer display
-            const currentTextContent = resultElement.innerHTML;
-
-            if (!currentTextContent || !currentTextContent.includes('Model Answer:')) {
-                // Show the answer
-                element.textContent = 'Hide Model Answer';
-                resultElement.style.color = 'var(--maths-gradient)'; 
-                resultElement.innerHTML = '<strong>Model Answer:</strong> <br>' + modelAnswer.replace(/\n/g, '<br>'); // Preserve line breaks
-            } else {
-                // Hide the answer
-                element.textContent = '💡 Show Model Answer';
-                resultElement.style.color = 'var(--text-secondary)';
-                resultElement.innerHTML = '';
-            }
-        }
-
-        // Function to handle quiz submission (basic numerical checking)
-        function submitQuiz(paperId) {
-            const paper = questionPapers.find(p => p.id === paperId);
-            let correctCount = 0;
-            let totalNumerical = 0;
-            
-            paper.content.forEach((q, index) => {
-                const qNum = index + 1;
-                const inputElement = document.getElementById(`answer_${qNum}`);
-                const resultElement = document.getElementById(`result_${qNum}`);
-
-                if (q.type === 'numerical') {
-                    totalNumerical++;
-                    
-                    // Reset styling/message
-                    resultElement.style.color = 'var(--text-secondary)';
-                    
-                    // Get values
-                    const userAnswerStr = inputElement.value.trim();
-                    const userAnswer = parseFloat(userAnswerStr);
-                    const correctAnswer = parseFloat(q.correctValue);
-                    
-                    if (userAnswerStr === '') {
-                        resultElement.innerHTML = '⚠️ Unattempted';
-                        return; // Continue to next question
-                    }
-                    
-                    if (!isNaN(userAnswer)) {
-                        // Check with a small tolerance (0.01) for floating point numbers
-                        if (Math.abs(userAnswer - correctAnswer) < 0.01) { 
-                            resultElement.innerHTML = '✅ Correct!';
-                            resultElement.style.color = 'var(--success-color)';
-                            correctCount++;
-                        } else {
-                            resultElement.innerHTML = `❌ Incorrect. The correct value is approximately ${correctAnswer}.`;
-                            resultElement.style.color = 'var(--error-color)';
+            for (const chapter of commonChapters) {
+                try {
+                    const response = await fetch(`papers/${subject}/${chapter}.txt`);
+                    if (response.ok) {
+                        const content = await response.text();
+                        if (content.trim()) {
+                            papers.push({
+                                id: `${subject}_${chapter}_${Date.now()}`,
+                                fileName: `${chapter}.txt`,
+                                subject: subject,
+                                chapterNum: extractChapterNumber(chapter),
+                                title: formatChapterTitle(chapter, subject),
+                                content: content,
+                                uploadDate: new Date().toLocaleDateString(),
+                                fileSize: formatFileSize(content.length)
+                            });
                         }
-                    } else {
-                        resultElement.innerHTML = '❌ Invalid input. Must be a number.';
-                        resultElement.style.color = 'var(--error-color)';
                     }
+                } catch (error) {
+                    // Silently continue if file doesn't exist
+                    continue;
                 }
-            });
-
-            const scoreElement = document.getElementById('quizScore');
-            if (totalNumerical > 0) {
-                 scoreElement.innerHTML = `Numerical Score: ${correctCount} / ${totalNumerical} correct`;
-                 scoreElement.style.color = correctCount === totalNumerical ? 'var(--success-color)' : 'var(--maths-gradient)';
-            } else {
-                 scoreElement.innerHTML = `No numerical questions to automatically score. Use the "Show Model Answer" for self-evaluation.`;
-                 scoreElement.style.color = 'var(--text-secondary)';
             }
+            
+            return papers;
         }
 
-        // **********************************************
-        // ******* MODIFIED CORE APP FUNCTIONS **********
-        // **********************************************
+        // Extract chapter number from filename
+        function extractChapterNumber(fileName) {
+            const match = fileName.match(/(?:ch|chapter)(\d+)/i);
+            return match ? match[1] : fileName.replace(/\D/g, '') || '1';
+        }
+
+        // Format chapter title
+        function formatChapterTitle(fileName, subject) {
+            let title = fileName
+                .replace(/ch(\d+)/gi, 'Chapter $1')
+                .replace(/chapter(\d+)/gi, 'Chapter $1')
+                .replace(/[_-]/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+            
+            if (!title.includes('Chapter')) {
+                title = `${title.charAt(0).toUpperCase() + title.slice(1)}`;
+            }
+            
+            return title;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        // Load sample data for demonstration (remove when implementing real file fetching)
+        function loadSampleData() {
+            const samples = [
+                {
+                    id: 'physics_mechanics_1',
+                    fileName: 'mechanics.txt',
+                    subject: 'physics',
+                    chapterNum: '1',
+                    title: 'Chapter 1: Mechanics & Motion',
+                    content: `MECHANICS - QUESTION PAPER
+
+Q1. Define Newton's first law of motion and give two practical examples.
+
+Q2. A car accelerates from rest to 60 km/h in 10 seconds. Calculate:
+   a) The acceleration of the car
+   b) The distance covered during acceleration
+
+Q3. Explain momentum conservation and derive the formula.
+
+Q4. A ball is thrown vertically upward with velocity 20 m/s. Find:
+   a) Maximum height reached
+   b) Time to reach maximum height
+   c) Total time of flight
+
+Q5. State Newton's third law with practical examples.
+
+Q6. Calculate force to stop a 1000 kg car moving at 20 m/s in 50m.`,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileSize: '2.1 KB'
+                },
+                {
+                    id: 'chemistry_organic_1',
+                    fileName: 'organic.txt', 
+                    subject: 'chemistry',
+                    chapterNum: '1',
+                    title: 'Organic Chemistry Basics',
+                    content: `ORGANIC CHEMISTRY - QUESTION PAPER
+
+Q1. Define organic chemistry and explain carbon's role.
+
+Q2. What is hybridization? Explain sp³, sp², sp with examples.
+
+Q3. Classify: C₂H₆, C₃H₆, C₄H₆ as alkanes/alkenes/alkynes.
+
+Q4. Write structural formulas for:
+   a) 2-methylbutane
+   b) 2-butene 
+   c) propyne
+
+Q5. Explain isomerism types with examples.
+
+Q6. List five functional groups with examples.`,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileSize: '1.8 KB'
+                },
+                {
+                    id: 'maths_calculus_1',
+                    fileName: 'calculus.txt',
+                    subject: 'maths', 
+                    chapterNum: '1',
+                    title: 'Differential Calculus',
+                    content: `CALCULUS - QUESTION PAPER
+
+Q1. Define derivative from first principles for f(x) = x².
+
+Q2. Find dy/dx for:
+   a) y = 3x⁴ - 2x³ + 5x - 1
+   b) y = sin(2x + 3)
+   c) y = eˣ ln(x)
+
+Q3. State and prove the chain rule.
+
+Q4. Find tangent equation to y = x³ - 2x² + x + 1 at x = 1.
+
+Q5. Verify Rolle's theorem for f(x) = x² - 4x + 3 in [1,3].
+
+Q6. Find maxima/minima of f(x) = x³ - 6x² + 9x + 2.`,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileSize: '2.0 KB'
+                }
+            ];
+            
+            return samples;
+        }
 
         // Initialize the application
         async function initializeApp() {
             try {
-                // Try to fetch real papers first (will return [] and use sample data)
+                // Try to fetch real papers first
                 questionPapers = await fetchPapersFromDirectory();
                 
                 // If no real papers found, use sample data
@@ -961,7 +900,7 @@
             }
         }
 
-        // Render subject statistics (no change)
+        // Render subject statistics
         function renderSubjectStats() {
             const statsContainer = document.getElementById('subjectStats');
             const subjectCounts = {};
@@ -975,12 +914,12 @@
                 <div class="subject-card ${subject} fade-in">
                     <div class="subject-icon">${config.icon}</div>
                     <div class="subject-name">${config.name}</div>
-                    <div class="subject-count">${subjectCounts[subject]} quizzes</div>
+                    <div class="subject-count">${subjectCounts[subject]} chapters</div>
                 </div>
             `).join('');
         }
 
-        // Render papers (modified to use paper.preview)
+        // Render papers by subject
         function renderPapers() {
             const container = document.getElementById('papersContainer');
             
@@ -988,7 +927,7 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📄</div>
-                        <h3>No quizzes found</h3>
+                        <h3>No papers found</h3>
                         <p>Try adjusting your search or check back later.</p>
                     </div>
                 `;
@@ -1013,7 +952,7 @@
                     <div class="papers-section ${subject} fade-in">
                         <div class="section-header">
                             <h2 class="section-title">${config.icon} ${config.name}</h2>
-                            <div class="section-badge">${papers.length} Quizzes</div>
+                            <div class="section-badge">${papers.length} Papers</div>
                         </div>
                         <div class="papers-grid">
                             ${papers.map(paper => `
@@ -1035,12 +974,12 @@
                                         </div>
                                     </div>
                                     <div class="paper-content">
-                                        ${paper.preview.substring(0, 200)}${paper.preview.length > 200 ? '...' : ''}
+                                        ${paper.content.substring(0, 200)}${paper.content.length > 200 ? '...' : ''}
                                     </div>
                                     <div class="paper-footer">
                                         <div class="chapter-badge ${subject}">Ch ${paper.chapterNum}</div>
                                         <a href="#" class="read-more" onclick="event.stopPropagation(); openPaper('${paper.id}')">
-                                            Start Quiz →
+                                            Read Full →
                                         </a>
                                     </div>
                                 </div>
@@ -1051,7 +990,7 @@
             }).join('');
         }
 
-        // Filter papers by subject (no change)
+        // Filter papers by subject
         function filterBySubject(subject) {
             currentFilter = subject;
             
@@ -1073,8 +1012,7 @@
             if (searchTerm) {
                 filteredPapers = filteredPapers.filter(paper =>
                     paper.title.toLowerCase().includes(searchTerm) ||
-                    // Search on the new preview content
-                    (paper.preview && paper.preview.toLowerCase().includes(searchTerm)) || 
+                    paper.content.toLowerCase().includes(searchTerm) ||
                     paper.chapterNum.toString().includes(searchTerm)
                 );
             }
@@ -1082,7 +1020,7 @@
             renderPapers();
         }
 
-        // Search functionality (modified to use paper.preview)
+        // Search functionality
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             
@@ -1093,8 +1031,7 @@
             if (searchTerm) {
                 papers = papers.filter(paper =>
                     paper.title.toLowerCase().includes(searchTerm) ||
-                    // Search on the new preview content
-                    (paper.preview && paper.preview.toLowerCase().includes(searchTerm)) || 
+                    paper.content.toLowerCase().includes(searchTerm) ||
                     paper.chapterNum.toString().includes(searchTerm)
                 );
             }
@@ -1103,22 +1040,14 @@
             renderPapers();
         });
 
-        // Modal functionality (MODIFIED: now renders the quiz)
+        // Modal functionality
         function openPaper(paperId) {
             const paper = questionPapers.find(p => p.id === paperId);
             if (paper) {
-                document.getElementById('modalTitle').textContent = `Interactive Quiz: ${paper.title}`;
-                
-                // *** RENDER THE QUIZ HTML ***
-                document.getElementById('modalBody').innerHTML = renderQuiz(paper); 
-
+                document.getElementById('modalTitle').textContent = paper.title;
+                document.getElementById('modalBody').textContent = paper.content;
                 document.getElementById('paperModal').style.display = 'block';
                 document.body.style.overflow = 'hidden';
-            }
-            // ---> ADD THIS LINE HERE <---
-            if (window.MathJax) {
-                // Tells MathJax to find and render any unrendered math in the whole document.
-                MathJax.typeset(); 
             }
         }
 
@@ -1127,7 +1056,7 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Event listeners (no change)
+        // Event listeners
         document.getElementById('paperModal').addEventListener('click', (e) => {
             if (e.target.id === 'paperModal') {
                 closeModal();
@@ -1145,6 +1074,33 @@
             initializeApp();
         });
 
-    </script>
-</body>
-</html>
+        // Real implementation function (uncomment and modify for your backend)
+        /*
+        async function fetchPapersFromDirectory() {
+            try {
+                const response = await fetch('/api/papers'); // Your backend endpoint
+                const data = await response.json();
+                return data.papers || [];
+            } catch (error) {
+                console.error('Error fetching papers:', error);
+                return [];
+            }
+        }
+
+        // Example backend endpoint structure:
+        // GET /api/papers should return:
+        // {
+        //   "papers": [
+        //     {
+        //       "id": "unique_id",
+        //       "fileName": "ch1.txt", 
+        //       "subject": "physics",
+        //       "chapterNum": "1",
+        //       "title": "Chapter 1: Mechanics",
+        //       "content": "full paper content...",
+        //       "uploadDate": "12/25/2023",
+        //       "fileSize": "2.1 KB"
+        //     }
+        //   ]
+        // }
+        */
