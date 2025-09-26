@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Papers Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --physics-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --chemistry-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --maths-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --dark-bg: #0a0a0a;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --glow: 0 0 30px rgba(102, 126, 234, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(245, 87, 108, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 18px 25px 18px 55px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar:focus {
+            box-shadow: var(--glow);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .filter-tabs {
+            display: flex;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 5px;
+            gap: 5px;
+        }
+
+        .filter-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .filter-tab.active {
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .filter-tab.physics.active {
+            background: var(--physics-gradient);
+        }
+
+        .filter-tab.chemistry.active {
+            background: var(--chemistry-gradient);
+        }
+
+        .filter-tab.maths.active {
+            background: var(--maths-gradient);
+        }
+
+        .filter-tab.all.active {
+            background: var(--primary-gradient);
+        }
+
+        /* Subject Stats */
+        .subject-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .subject-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .subject-card.physics::before {
+            background: var(--physics-gradient);
+        }
+
+        .subject-card.chemistry::before {
+            background: var(--chemistry-gradient);
+        }
+
+        .subject-card.maths::before {
+            background: var(--maths-gradient);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow);
+        }
+
+        .subject-card:hover::before {
+            opacity: 1;
+        }
+
+        .subject-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .subject-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        .subject-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Papers Grid */
+        .papers-section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        .section-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .physics .section-badge {
+            background: var(--physics-gradient);
+        }
+
+        .chemistry .section-badge {
+            background: var(--chemistry-gradient);
+        }
+
+        .maths .section-badge {
+            background: var(--maths-gradient);
+        }
+
+        .papers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .paper-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .paper-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .paper-card.physics::before {
+            background: var(--physics-gradient);
+        }
+
+        .paper-card.chemistry::before {
+            background: var(--chemistry-gradient);
+        }
+
+        .paper-card.maths::before {
+            background: var(--maths-gradient);
+        }
+
+        .paper-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .paper-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .paper-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .paper-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .paper-icon.physics {
+            background: var(--physics-gradient);
+        }
+
+        .paper-icon.chemistry {
+            background: var(--chemistry-gradient);
+        }
+
+        .paper-icon.maths {
+            background: var(--maths-gradient);
+        }
+
+        .paper-info h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .paper-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .paper-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.9rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .paper-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chapter-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .chapter-badge.physics {
+            background: var(--physics-gradient);
+        }
+
+        .chapter-badge.chemistry {
+            background: var(--chemistry-gradient);
+        }
+
+        .chapter-badge.maths {
+            background: var(--maths-gradient);
+        }
+
+        .read-more {
+            color: rgba(102, 126, 234, 0.8);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #667eea;
+            transform: translateX(3px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            max-width: 900px;
+            margin: 0 auto;
+            margin-top: 50px;
+            border-radius: 25px;
+            padding: 40px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            animation: modalSlideUp 0.4s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+            font-size: 1.6rem;
+            font-weight: 700;
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Loading and Empty States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                max-width: none;
+            }
+            
+            .filter-tabs {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .subject-stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .papers-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .modal-content {
+                margin-top: 20px;
+                padding: 25px;
+                border-radius: 20px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Question Papers Hub</h1>
+            <p>Your comprehensive collection of question papers, organized by subjects and chapters</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-container">
+                <div class="search-icon">🔍</div>
+                <input type="text" class="search-bar" id="searchInput" placeholder="Search papers, chapters, or content..." />
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab all active" onclick="filterBySubject('all')">All</button>
+                <button class="filter-tab physics" onclick="filterBySubject('physics')">Physics</button>
+                <button class="filter-tab chemistry" onclick="filterBySubject('chemistry')">Chemistry</button>
+                <button class="filter-tab maths" onclick="filterBySubject('maths')">Mathematics</button>
+            </div>
+        </div>
+
+        <div class="subject-stats" id="subjectStats">
+            <div class="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Loading question papers...</div>
+            </div>
+        </div>
+
+        <div id="papersContainer">
+            <!-- Papers will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Modal for displaying paper content -->
+    <div id="paperModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Question Paper</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let questionPapers = [];
+        let filteredPapers = [];
+        let currentFilter = 'all';
+
+        const subjectConfig = {
+            physics: { icon: '⚡', name: 'Physics', color: 'physics' },
+            chemistry: { icon: '🧪', name: 'Chemistry', color: 'chemistry' },  
+            maths: { icon: '📐', name: 'Mathematics', color: 'maths' }
+        };
+
+        // Fetch papers from directory structure
+        async function fetchPapersFromDirectory() {
+            try {
+                const papers = [];
+                
+                // Fetch from each subject directory
+                for (const [subject, config] of Object.entries(subjectConfig)) {
+                    try {
+                        const subjectPapers = await fetchSubjectPapers(subject);
+                        papers.push(...subjectPapers);
+                    } catch (error) {
+                        console.warn(`Could not load papers for ${subject}:`, error);
+                    }
+                }
+                
+                return papers;
+            } catch (error) {
+                console.error('Error fetching papers:', error);
+                return [];
+            }
+        }
+
+        // Fetch papers for a specific subject
+        async function fetchSubjectPapers(subject) {
+            const papers = [];
+            
+            // Try to fetch common chapter names (you can expand this list)
+            const commonChapters = [
+                'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'ch6', 'ch7', 'ch8', 'ch9', 'ch10',
+                'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5',
+                'mechanics', 'thermodynamics', 'waves', 'optics', 'electricity',
+                'organic', 'inorganic', 'physical', 'analytical',
+                'algebra', 'calculus', 'geometry', 'trigonometry', 'statistics'
+            ];
+            
+            for (const chapter of commonChapters) {
+                try {
+                    const response = await fetch(`papers/${subject}/${chapter}.txt`);
+                    if (response.ok) {
+                        const content = await response.text();
+                        if (content.trim()) {
+                            papers.push({
+                                id: `${subject}_${chapter}_${Date.now()}`,
+                                fileName: `${chapter}.txt`,
+                                subject: subject,
+                                chapterNum: extractChapterNumber(chapter),
+                                title: formatChapterTitle(chapter, subject),
+                                content: content,
+                                uploadDate: new Date().toLocaleDateString(),
+                                fileSize: formatFileSize(content.length)
+                            });
+                        }
+                    }
+                } catch (error) {
+                    // Silently continue if file doesn't exist
+                    continue;
+                }
+            }
+            
+            return papers;
+        }
+
+        // Extract chapter number from filename
+        function extractChapterNumber(fileName) {
+            const match = fileName.match(/(?:ch|chapter)(\d+)/i);
+            return match ? match[1] : fileName.replace(/\D/g, '') || '1';
+        }
+
+        // Format chapter title
+        function formatChapterTitle(fileName, subject) {
+            let title = fileName
+                .replace(/ch(\d+)/gi, 'Chapter $1')
+                .replace(/chapter(\d+)/gi, 'Chapter $1')
+                .replace(/[_-]/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+            
+            if (!title.includes('Chapter')) {
+                title = `${title.charAt(0).toUpperCase() + title.slice(1)}`;
+            }
+            
+            return title;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        // Load sample data for demonstration (remove when implementing real file fetching)
+        function loadSampleData() {
+            const samples = [
+                {
+                    id: 'physics_mechanics_1',
+                    fileName: 'mechanics.txt',
+                    subject: 'physics',
+                    chapterNum: '1',
+                    title: 'Chapter 1: Mechanics & Motion',
+                    content: `MECHANICS - QUESTION PAPER
+
+Q1. Define Newton's first law of motion and give two practical examples.
+
+Q2. A car accelerates from rest to 60 km/h in 10 seconds. Calculate:
+   a) The acceleration of the car
+   b) The distance covered during acceleration
+
+Q3. Explain momentum conservation and derive the formula.
+
+Q4. A ball is thrown vertically upward with velocity 20 m/s. Find:
+   a) Maximum height reached
+   b) Time to reach maximum height
+   c) Total time of flight
+
+Q5. State Newton's third law with practical examples.
+
+Q6. Calculate force to stop a 1000 kg car moving at 20 m/s in 50m.`,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileSize: '2.1 KB'
+                },
+                {
+                    id: 'chemistry_organic_1',
+                    fileName: 'organic.txt', 
+                    subject: 'chemistry',
+                    chapterNum: '1',
+                    title: 'Organic Chemistry Basics',
+                    content: `ORGANIC CHEMISTRY - QUESTION PAPER
+
+Q1. Define organic chemistry and explain carbon's role.
+
+Q2. What is hybridization? Explain sp³, sp², sp with examples.
+
+Q3. Classify: C₂H₆, C₃H₆, C₄H₆ as alkanes/alkenes/alkynes.
+
+Q4. Write structural formulas for:
+   a) 2-methylbutane
+   b) 2-butene 
+   c) propyne
+
+Q5. Explain isomerism types with examples.
+
+Q6. List five functional groups with examples.`,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileSize: '1.8 KB'
+                },
+                {
+                    id: 'maths_calculus_1',
+                    fileName: 'calculus.txt',
+                    subject: 'maths', 
+                    chapterNum: '1',
+                    title: 'Differential Calculus',
+                    content: `CALCULUS - QUESTION PAPER
+
+Q1. Define derivative from first principles for f(x) = x².
+
+Q2. Find dy/dx for:
+   a) y = 3x⁴ - 2x³ + 5x - 1
+   b) y = sin(2x + 3)
+   c) y = eˣ ln(x)
+
+Q3. State and prove the chain rule.
+
+Q4. Find tangent equation to y = x³ - 2x² + x + 1 at x = 1.
+
+Q5. Verify Rolle's theorem for f(x) = x² - 4x + 3 in [1,3].
+
+Q6. Find maxima/minima of f(x) = x³ - 6x² + 9x + 2.`,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileSize: '2.0 KB'
+                }
+            ];
+            
+            return samples;
+        }
+
+        // Initialize the application
+        async function initializeApp() {
+            try {
+                // Try to fetch real papers first
+                questionPapers = await fetchPapersFromDirectory();
+                
+                // If no real papers found, use sample data
+                if (questionPapers.length === 0) {
+                    questionPapers = loadSampleData();
+                }
+                
+                filteredPapers = [...questionPapers];
+                renderSubjectStats();
+                renderPapers();
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                questionPapers = loadSampleData();
+                filteredPapers = [...questionPapers];
+                renderSubjectStats();
+                renderPapers();
+            }
+        }
+
+        // Render subject statistics
+        function renderSubjectStats() {
+            const statsContainer = document.getElementById('subjectStats');
+            const subjectCounts = {};
+            
+            // Count papers per subject
+            Object.keys(subjectConfig).forEach(subject => {
+                subjectCounts[subject] = questionPapers.filter(p => p.subject === subject).length;
+            });
+            
+            statsContainer.innerHTML = Object.entries(subjectConfig).map(([subject, config]) => `
+                <div class="subject-card ${subject} fade-in">
+                    <div class="subject-icon">${config.icon}</div>
+                    <div class="subject-name">${config.name}</div>
+                    <div class="subject-count">${subjectCounts[subject]} chapters</div>
+                </div>
+            `).join('');
+        }
+
+        // Render papers by subject
+        function renderPapers() {
+            const container = document.getElementById('papersContainer');
+            
+            if (filteredPapers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <h3>No papers found</h3>
+                        <p>Try adjusting your search or check back later.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group papers by subject
+            const papersBySubject = {};
+            filteredPapers.forEach(paper => {
+                if (!papersBySubject[paper.subject]) {
+                    papersBySubject[paper.subject] = [];
+                }
+                papersBySubject[paper.subject].push(paper);
+            });
+            
+            // Render sections for each subject
+            container.innerHTML = Object.entries(papersBySubject).map(([subject, papers]) => {
+                const config = subjectConfig[subject];
+                if (!config) return '';
+                
+                return `
+                    <div class="papers-section ${subject} fade-in">
+                        <div class="section-header">
+                            <h2 class="section-title">${config.icon} ${config.name}</h2>
+                            <div class="section-badge">${papers.length} Papers</div>
+                        </div>
+                        <div class="papers-grid">
+                            ${papers.map(paper => `
+                                <div class="paper-card ${subject}" onclick="openPaper('${paper.id}')">
+                                    <div class="paper-header">
+                                        <div class="paper-icon ${subject}">📄</div>
+                                        <div class="paper-info">
+                                            <h3>${paper.title}</h3>
+                                            <div class="paper-meta">
+                                                <div class="meta-item">
+                                                    <span>📅</span>
+                                                    <span>${paper.uploadDate}</span>
+                                                </div>
+                                                <div class="meta-item">
+                                                    <span>📊</span>
+                                                    <span>${paper.fileSize}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="paper-content">
+                                        ${paper.content.substring(0, 200)}${paper.content.length > 200 ? '...' : ''}
+                                    </div>
+                                    <div class="paper-footer">
+                                        <div class="chapter-badge ${subject}">Ch ${paper.chapterNum}</div>
+                                        <a href="#" class="read-more" onclick="event.stopPropagation(); openPaper('${paper.id}')">
+                                            Read Full →
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter papers by subject
+        function filterBySubject(subject) {
+            currentFilter = subject;
+            
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter papers
+            if (subject === 'all') {
+                filteredPapers = [...questionPapers];
+            } else {
+                filteredPapers = questionPapers.filter(paper => paper.subject === subject);
+            }
+            
+            // Apply search if active
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filteredPapers = filteredPapers.filter(paper =>
+                    paper.title.toLowerCase().includes(searchTerm) ||
+                    paper.content.toLowerCase().includes(searchTerm) ||
+                    paper.chapterNum.toString().includes(searchTerm)
+                );
+            }
+            
+            renderPapers();
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            // Start with current filter
+            let papers = currentFilter === 'all' ? questionPapers : questionPapers.filter(p => p.subject === currentFilter);
+            
+            // Apply search filter
+            if (searchTerm) {
+                papers = papers.filter(paper =>
+                    paper.title.toLowerCase().includes(searchTerm) ||
+                    paper.content.toLowerCase().includes(searchTerm) ||
+                    paper.chapterNum.toString().includes(searchTerm)
+                );
+            }
+            
+            filteredPapers = papers;
+            renderPapers();
+        });
+
+        // Modal functionality
+        function openPaper(paperId) {
+            const paper = questionPapers.find(p => p.id === paperId);
+            if (paper) {
+                document.getElementById('modalTitle').textContent = paper.title;
+                document.getElementById('modalBody').textContent = paper.content;
+                document.getElementById('paperModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('paperModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event listeners
+        document.getElementById('paperModal').addEventListener('click', (e) => {
+            if (e.target.id === 'paperModal') {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+
+        // Real implementation function (uncomment and modify for your backend)
+        /*
+        async function fetchPapersFromDirectory() {
+            try {
+                const response = await fetch('/api/papers'); // Your backend endpoint
+                const data = await response.json();
+                return data.papers || [];
+            } catch (error) {
+                console.error('Error fetching papers:', error);
+                return [];
+            }
+        }
+
+        // Example backend endpoint structure:
+        // GET /api/papers should return:
+        // {
+        //   "papers": [
+        //     {
+        //       "id": "unique_id",
+        //       "fileName": "ch1.txt", 
+        //       "subject": "physics",
+        //       "chapterNum": "1",
+        //       "title": "Chapter 1: Mechanics",
+        //       "content": "full paper content...",
+        //       "uploadDate": "12/25/2023",
+        //       "fileSize": "2.1 KB"
+        //     }
+        //   ]
+        // }
+        */
